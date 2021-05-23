@@ -6,13 +6,8 @@ use std::time::Instant;
 fn main() {
     let (file_path, patterns) = get_cli_arguments();
     let searched_file_content = load_whole_file_as_string(file_path.as_str());
-    let longest_pattern_len = patterns
-        .iter()
-        .max_by(|x, y| x.len().cmp(&y.len()))
-        .unwrap()
-        .len();
     let start = Instant::now();
-    let matches_idx = naive_string_matcher(searched_file_content, patterns, longest_pattern_len);
+    let matches_idx = naive_string_matcher(&searched_file_content, &patterns[0].chars().collect());
     println!(
         "TIME IN NANOSECONDS: {}\nMATCHES: {:?}",
         start.elapsed().as_nanos(),
@@ -20,28 +15,25 @@ fn main() {
     );
 }
 
-fn naive_string_matcher(
-    searched_file_content: Vec<char>,
-    patterns: Vec<String>,
-    longest_pattern_len: usize,
-) -> Vec<usize> {
-    let mut idx = 0;
-    let mut matched_index: Vec<usize> = vec![];
-    let mut current_word: String = searched_file_content[0..longest_pattern_len]
-        .to_vec()
-        .iter()
-        .collect();
-    for ch in searched_file_content.into_iter().skip(longest_pattern_len) {
-        patterns.iter().for_each(|pattern| {
-            if current_word.starts_with(pattern) {
-                matched_index.push(idx);
+fn naive_string_matcher(searched_space: &Vec<char>, pattern: &Vec<char>) -> Vec<usize> {
+    let mut matches: Vec<usize> = vec![];
+    let pattern_length = pattern.len();
+    let stop_length = searched_space.len() - pattern_length;
+    for space_index in 0..stop_length {
+        let mut does_match = true;
+        let mut searched_frame_index = space_index;
+        for pattern_letter in pattern {
+            if *pattern_letter != searched_space[searched_frame_index] {
+                does_match = false;
+                break;
             }
-        });
-        current_word.drain(0..1);
-        current_word.push(ch);
-        idx += 1;
+            searched_frame_index += 1;
+        }
+        if does_match {
+            matches.push(space_index)
+        }
     }
-    return matched_index;
+    return matches;
 }
 
 fn get_cli_arguments() -> (String, Vec<String>) {
