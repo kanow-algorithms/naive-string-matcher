@@ -18,6 +18,14 @@ fn should_find_three_matches_in_many_line_text() {
 }
 
 #[test]
+fn should_find_match_in_the_end_of_text() {
+    let text = vec!['H', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd'];
+    let pattern = vec!['w', 'o', 'r', 'l', 'd'];
+    let matches = naive_string_matcher(&text, &pattern);
+    assert_eq!(matches[0], 6);
+}
+
+#[test]
 fn should_not_find_any_match() {
     let text = String::from("John is a nice guy\nTom is a nice guy\nBob is not a nice guy");
     let pattern = String::from("Kris");
