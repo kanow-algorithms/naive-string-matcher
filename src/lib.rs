@@ -1,10 +1,9 @@
-fn naive_string_matcher(text: &Vec<char>, pattern: &Vec<char>) -> Vec<usize> {
+pub fn naive_string_matcher(text: &Vec<char>, pattern: &Vec<char>) -> Vec<usize> {
     let mut matches: Vec<usize> = vec![];
-    let pattern_length = pattern.len();
-    let stop_length = text.len() - pattern_length;
-    for space_index in 0..stop_length {
+    let stop_index = text.len() - pattern.len();
+    for current_index in 0..stop_index {
         let mut does_match = true;
-        let mut searched_frame_index = space_index;
+        let mut searched_frame_index = current_index;
         for pattern_letter in pattern {
             if *pattern_letter != text[searched_frame_index] {
                 does_match = false;
@@ -13,7 +12,7 @@ fn naive_string_matcher(text: &Vec<char>, pattern: &Vec<char>) -> Vec<usize> {
             searched_frame_index += 1;
         }
         if does_match {
-            matches.push(space_index)
+            matches.push(current_index)
         }
     }
     return matches;
